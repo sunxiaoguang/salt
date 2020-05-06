@@ -12,6 +12,7 @@ import logging
 
 import salt.utils.files
 import salt.utils.path
+import salt.utils.verify
 import salt.payload
 
 from salt.ext import six
@@ -34,6 +35,8 @@ def mk_token(opts, tdata):
     hash_type = getattr(hashlib, opts.get('hash_type', 'md5'))
     tok = six.text_type(hash_type(os.urandom(512)).hexdigest())
     t_path = os.path.join(opts['token_dir'], tok)
+    if not salt.utils.verify.clean_path(opts['token_dir'], t_path):
+        return {}
     while os.path.isfile(t_path):
         tok = six.text_type(hash_type(os.urandom(512)).hexdigest())
         t_path = os.path.join(opts['token_dir'], tok)
